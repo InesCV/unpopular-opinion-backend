@@ -11,6 +11,7 @@ const opinionSchema = new Schema ({
   category: {
     type: String,
     required: true,
+    default: 'Random',
     enum: ['Philosoraptor', 'Politics', 'Sex', 'Music', 'Food', 'Sports', 'Weird Stuff', 'Random'],
   },
   // photo: { 
@@ -21,20 +22,20 @@ const opinionSchema = new Schema ({
   question: { 
     type: String, 
     required: true,
-    maxlength: 40,
+    maxlength: 140,
   },
   response: {
     x: { 
       type: String, 
       default: "Yes",
       required: false,
-      maxlength: 5,
+      maxlength: 15,
     },
     y: { 
       type: String, 
       default: "No",
       required: false,
-      maxlength: 5,
+      maxlength: 15,
     },
   },
   // location: { 
