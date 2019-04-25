@@ -7,7 +7,7 @@ const Opinion = require('../models/opinion');
 
 // const { isLoggedIn } = require('../helpers/middlewares');
 
-router.get('/', (req, res, next) => {
+router.get('/', (req, res, next) => {  
   res.status(200).json([
     { 
       author: 'Paco is the author',
@@ -48,12 +48,17 @@ router.get('/', (req, res, next) => {
   ]);
 });
 
+router.get('/categories', (req, res, next) => {
+  console.log(Opinion.schema.path('category').enumValues);
+  res.status(200).json(Opinion.schema.path('category').enumValues);
+});
+
 router.post('/', async (req, res, next) => {
-  const { author, category, question, response } = req.body;
+  // const author = res.locals.currentUser._id;
+  const { category, question, response } = req.body;
   console.log(req.body)
   try {
-    const newOpinion = await Opinion.create({ author, category, question, response })
-    req.session.currentUser = newOpinion;
+    const newOpinion = await Opinion.create({ category, question, response })
     res.status(200).json(newOpinion);
   } catch (error) {
     next(error);
