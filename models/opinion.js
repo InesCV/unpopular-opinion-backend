@@ -11,6 +11,9 @@ const opinionSchema = new Schema ({
     default: 'Anonymous',
     required: true,
   },
+  description: { 
+    type: String, 
+  },
   // categoryID: String,
   category: {
     type: String,
