@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
+const { ObjectId } = Schema.Types;
 
 const opinionSchema = new Schema({
-  // author: {
-  //   type: ObjectId,
-  //   ref: 'User',
-  // },
   author: {
-    type: String,
-    default: 'Anonymous',
-    required: true,
+    type: ObjectId,
+    ref: 'User',
   },
+  // author: {
+  //   type: String,
+  //   default: 'Anonymous',
+  //   required: true,
+  // },
   // categoryID: String,
   category: {
     type: String,
