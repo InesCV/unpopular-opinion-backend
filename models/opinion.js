@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const opinionSchema = new Schema ({
+const { Schema } = mongoose;
+
+const opinionSchema = new Schema({
   // author: {
   //   type: ObjectId,
   //   ref: 'User',
   // },
-  author: { 
-    type: String, 
+  author: {
+    type: String,
     default: 'Anonymous',
     required: true,
   },
@@ -18,54 +19,54 @@ const opinionSchema = new Schema ({
     default: 'Random',
     enum: ['Philosoraptor', 'Politics', 'Sex', 'Music', 'Food', 'Sports', 'Weird Stuff', 'Random'],
   },
-  // photo: { 
-  //   type: String, 
-  //   default: null, 
+  // photo: {
+  //   type: String,
+  //   default: null,
   //   required: false,
   // },
-  question: { 
-    type: String, 
+  question: {
+    type: String,
     required: true,
     maxlength: 140,
   },
   response: {
-    x: { 
-      type: String, 
-      default: "Yes",
+    x: {
+      type: String,
+      default: 'Yes',
       required: false,
       maxlength: 15,
     },
-    y: { 
-      type: String, 
-      default: "No",
+    y: {
+      type: String,
+      default: 'No',
       required: false,
       maxlength: 15,
     },
   },
-  // location: { 
-  //   lat: Number, 
+  // location: {
+  //   lat: Number,
   //   long: Number
   // },
   // reported: {
-  //   isReported: { 
+  //   isReported: {
   //     type: Boolean,
   //     default: false,
   //   },
-  //   isRevised: { 
+  //   isRevised: {
   //     type: Boolean,
   //     default: false,
   //   },
-  //   by: { 
+  //   by: {
   //     type: Array,
   //     ref: 'User',
   //   },
   // },
   // modified: {
-  //   isModified: { 
+  //   isModified: {
   //     type: Boolean,
   //     default: false,
   //   },
-  //   isRevised: { 
+  //   isRevised: {
   //     type: Boolean,
   //     default: false,
   //   }

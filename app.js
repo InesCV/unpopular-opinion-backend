@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const favicon = require('serve-favicon');
+// const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -20,9 +20,9 @@ mongoose
     reconnectTries: Number.MAX_VALUE,
   })
   .then(() => {
-    console.log(`Connected to database`);
+    console.log('Connected to database');
   })
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
   });
 
