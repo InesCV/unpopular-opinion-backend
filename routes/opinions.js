@@ -7,7 +7,7 @@ const Opinion = require('../models/opinion');
 const { isLoggedIn } = require('../helpers/middlewares');
 
 router.get('/', isLoggedIn(), async (req, res) => {
-  const opinions = await Opinion.find();
+  const opinions = await Opinion.find().populate('author');
   res.status(200).json(opinions);
 });
 
