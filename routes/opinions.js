@@ -4,21 +4,20 @@ const router = express.Router();
 
 const Opinion = require('../models/opinion');
 
-// const { isLoggedIn } = require('../helpers/middlewares');
+const { isLoggedIn } = require('../helpers/middlewares');
 
-router.get('/', async (req, res) => {
-  console.log(req.session.currentUser);
+router.get('/', isLoggedIn(), async (req, res) => {
   const opinions = await Opinion.find();
   res.status(200).json(opinions);
 });
 
-router.get('/categories', (req, res) => {
+router.get('/categories', isLoggedIn(), (req, res) => {
   res.status(200).json(Opinion.schema.path('category').enumValues);
 });
 
-router.post('/', async (req, res, next) => {
-  const author = req.session.currentUser;
-  console.log(req.session);
+router.post('/', isLoggedIn(), async (req, res, next) => {
+  console.log('Back-currentUser: ', req.session.currentUser);
+  const { _id: author } = req.session.currentUser;
   const { category, question, response } = req.body;
   try {
     const newOpinion = await Opinion.create({
