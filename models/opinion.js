@@ -8,23 +8,16 @@ const opinionSchema = new Schema({
     type: ObjectId,
     ref: 'User',
   },
-  // author: {
-  //   type: String,
-  //   default: 'Anonymous',
-  //   required: true,
-  // },
-  // categoryID: String,
   category: {
     type: String,
     required: true,
     default: 'Random',
     enum: ['Philosoraptor', 'Politics', 'Sex', 'Music', 'Food', 'Sports', 'Weird Stuff', 'Random'],
   },
-  // photo: {
-  //   type: String,
-  //   default: null,
-  //   required: false,
-  // },
+  photo: {
+    type: String,
+    required: false,
+  },
   question: {
     type: String,
     required: true,
@@ -72,6 +65,11 @@ const opinionSchema = new Schema({
   //     default: false,
   //   }
   // }
+}, {
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
 });
 
 const Opinion = mongoose.model('Opinion', opinionSchema);
