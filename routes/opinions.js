@@ -5,7 +5,7 @@ const Opinion = require('../models/opinion');
 
 const { isLoggedIn } = require('../helpers/middlewares');
 
-router.use(isLoggedIn("admin"))
+router.use(isLoggedIn("user"));
 
 router.get('/', async (req, res, next) => {
   try {
@@ -25,7 +25,6 @@ router.get('/categories', async (req, res, next) => {
 });
 
 router.post('/', async (req, res, next) => {
-  console.log('Back-currentUser: ', req.session.currentUser);
   const { _id: author } = req.session.currentUser;
   const { category, question, response } = req.body;
   try {
