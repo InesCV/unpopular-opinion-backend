@@ -12,7 +12,8 @@ router.use(isLoggedIn('user'));
 
 router.get('/', async (req, res, next) => {
   try {
-    const opinions = await Opinion.find().populate('author');
+    const opinions = await Response.find().populate('opinion, user');
+    console.log(opinions);
     res.status(200).json(opinions);
   } catch (error) {
     next(error);
