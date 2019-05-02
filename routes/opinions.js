@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Opinion = require('../models/opinion');
+const Response = require('../models/response');
 const { isLoggedIn } = require('../helpers/middlewares');
 
 router.use(isLoggedIn("user"));
@@ -36,10 +37,14 @@ router.get('/categories', async (req, res, next) => {
   }
 });
 
-router.get('/response', async (req, res, next) => {
+router.post('/response', async (req, res, next) => {
+  const response = req.body;
   try {
-    
-
+    const registeredQuestion = await Response.create(response);
+    res.status(200).json({
+      message: "Response registered succesfully",
+      registeredQuestion,
+    });
   } catch(error) {
     next(error);
   }
