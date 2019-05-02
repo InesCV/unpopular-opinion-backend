@@ -1,15 +1,7 @@
 const createError = require('http-errors');
 
-// exports.isLoggedIn = (role) => (req, res, next) => {
-//   if (req.session.currentUser && user.role === role) {
-//     next();
-//   } else {
-//     next(createError(401));
-//   }
-// };
-
-exports.isLoggedIn = () => (req, res, next) => {
-  if (req.session.currentUser) {
+exports.isLoggedIn = (role) => (req, res, next) => {
+  if (req.session.currentUser && ( req.session.currentUser.role == role ) ) {
     next();
   } else {
     next(createError(401));

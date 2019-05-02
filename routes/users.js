@@ -8,7 +8,6 @@ const { isLoggedIn } = require('../helpers/middlewares');
 
 router.get('/:id', async(req, res, next) => {
   const { id: user } = req.params;
-  console.log('user: ', user);
   
   try{
     const { username, description, avatar, role} = await User.findById(user);
@@ -33,5 +32,14 @@ router.get('/:id', async(req, res, next) => {
   }
 });
 
+// router.put('/user', async(req, res, next) => {
+//   const newData = req.body;
+//   try{
+//     const userModifiedData = await User.findByIdAndUpdate(userID, { name, description }, { new:true });
+//     res.status(200).json({message: 'hola'})
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 module.exports = router;
