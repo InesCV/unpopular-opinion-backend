@@ -4,19 +4,22 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
 
 const responseSchema = new Schema({
-  author: {
-    type: ObjectId,
-    ref: 'User',
-  },
   opinion: {
     type: ObjectId,
     ref: 'Opinion',
   },
-  response: {
+  responses: [
+    {
+      user: ObjectId,
+      response: {
+        type: String,
+        enum: [x, y],
+      },
+    }
+  ],
     type: String,
     required: true,
     maxlength: 15,
-  },
 }, {
   timestamps: {
     createdAt: 'created_at',
