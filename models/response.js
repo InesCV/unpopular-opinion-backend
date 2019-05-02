@@ -10,16 +10,16 @@ const responseSchema = new Schema({
   },
   responses: [
     {
-      user: ObjectId,
+      user: { 
+        type: ObjectId,
+        ref: 'User',
+      },
       response: {
         type: String,
-        enum: [x, y],
+        enum: ['x', 'y'],
       },
     }
   ],
-    type: String,
-    required: true,
-    maxlength: 15,
 }, {
   timestamps: {
     createdAt: 'created_at',
