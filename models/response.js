@@ -10,7 +10,7 @@ const responseSchema = new Schema({
   },
   responses: [
     {
-      user: { 
+      user: {
         type: ObjectId,
         ref: 'User',
       },
@@ -18,7 +18,7 @@ const responseSchema = new Schema({
         type: String,
         enum: ['x', 'y'],
       },
-    }
+    },
   ],
 }, {
   timestamps: {
