@@ -12,7 +12,7 @@ const {
   validationLoggin,
 } = require('../helpers/middlewares');
 
-router.get('/me', isLoggedIn(), (req, res, next) => {
+router.get('/me', isLoggedIn("user"), (req, res, next) => {
   res.json(req.session.currentUser);
 });
 
@@ -62,12 +62,12 @@ router.post(
   },
 );
 
-router.post('/logout', isLoggedIn(), (req, res, next) => {
+router.post('/logout', isLoggedIn("user"), (req, res, next) => {
   req.session.destroy();
   return res.status(204).send();
 });
 
-router.get('/private', isLoggedIn(), (req, res, next) => {
+router.get('/private', isLoggedIn("user"), (req, res, next) => {
   res.status(200).json({
     message: 'This is a private message',
   });
