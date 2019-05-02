@@ -13,9 +13,11 @@ router.use(isLoggedIn('user'));
 router.get('/', async (req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   try {
-    const opinions = await Response.find({ responses: { $nin: [userId] } });
-    console.log(opinions);
+    const opinions = await Opinion.find().populate('author');
     res.status(200).json(opinions);
+    // const opinions = await Response.find({ "responses.user": { $nin: [userId] }}).populate('opinion');
+    // console.log(opinions);
+    // res.status(200).json(opinions);
   } catch (error) {
     next(error);
   }
