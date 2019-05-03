@@ -13,23 +13,13 @@ router.use(isLoggedIn('user'));
 router.get('/', async (req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   try {
-    const opinions = await Opinion.find().populate('author');
-    res.status(200).json(opinions);
-    // const opinions = await Response.find({ "responses.user": { $nin: [userId] }}).populate('opinion');
-    // console.log(opinions);
-    // res.status(200).json(opinions);
+    const responsed = await Response.find({ "responses.user": { $in: [userId] }}).select("opinion -_id");
+    const filter = responsed.map( e => e.opinion);
+    const filteredOpinions = await Opinion.find({_id: {$nin: filter}}).populate('author');
+    res.status(200).json(filteredOpinions);
   } catch (error) {
     next(error);
   }
-  // const { _id: userId } = req.session.currentUser;
-  // try {
-  //   console.log(userId);
-  //   const opinions = await Response.find({ responses: { $nin: [mongoose.Types.ObjectId(userId)] } });
-  //   console.log(opinions);
-  //   res.status(200).json(opinions);
-  // } catch (error) {
-  //   next(error);
-  // }
 });
 
 router.get('/all', async (req, res, next) => {

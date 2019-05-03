@@ -1,22 +1,24 @@
-const express = require ('Express');
+const express = require('express');
+
 const router = express.Router();
 
-const User = require ('../models/user');
-const Opinion = require ('../models/opinion');
+const User = require('../models/user');
+const Opinion = require('../models/opinion');
+const Response = require('../models/response');
 
 const { isLoggedIn } = require('../helpers/middlewares');
 
-router.get('/:id', async(req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   const { id: user } = req.params;
-  
-  try{
-    const { username, description, avatar, role} = await User.findById(user);
-    const opinions = await Opinion.find({ author: { $in: [user] } }).select("category question response -_id");
-    const responses = await Response.find({ author: { $in: [user] } }).select("category question response -_id");
+
+  try {
+    const { username, description, avatar, role } = await User.findById(user);
+    const opinions = await Opinion.find({ author: { $in: [user] } }).select('category question response -_id');
+    const responses = await Response.find({ author: { $in: [user] } }).select('category question response -_id');
 
 
     res.status(200).json({
-      message: "User data returned succesfully",
+      message: 'User data returned succesfully',
       user: {
         username,
         description,
@@ -24,10 +26,10 @@ router.get('/:id', async(req, res, next) => {
         role,
         opinions,
         request: {
-            type: 'GET',
-            url: `${process.env.HEROKU}/users/` + user,
-        }
-      }
+          type: 'GET',
+          url: `${process.env.HEROKU}/users/${user}`,
+        },
+      },
     });
   } catch (error) {
     next(error);
