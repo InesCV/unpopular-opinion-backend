@@ -2,7 +2,7 @@
 const express = require('express');
 
 const router = express.Router();
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
 const Opinion = require('../models/opinion');
 const Response = require('../models/response');
@@ -13,9 +13,9 @@ router.use(isLoggedIn('user'));
 router.get('/', async (req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   try {
-    const responsed = await Response.find({ "responses.user": { $in: [userId] }}).select("opinion -_id");
-    const filter = responsed.map( e => e.opinion);
-    const filteredOpinions = await Opinion.find({_id: {$nin: filter}}).populate('author');
+    const responsed = await Response.find({ 'responses.user': { $in: [userId] } }).select('opinion -_id');
+    const filter = responsed.map(e => e.opinion);
+    const filteredOpinions = await Opinion.find({ _id: { $nin: filter } }).populate('author');
     res.status(200).json(filteredOpinions);
   } catch (error) {
     next(error);
