@@ -21,6 +21,19 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.post('/', async (req, res, next) => {
+  const { _id: author } = req.session.currentUser;
+  const { category, question, response } = req.body;
+  try {
+    const newOpinion = await Opinion.create({
+      author, category, question, response,
+    });
+    res.status(200).json(newOpinion);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/all', async (req, res, next) => {
   try {
     const opinions = await Opinion.find().populate('author');
@@ -30,14 +43,11 @@ router.get('/all', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
-  const { _id: author } = req.session.currentUser;
-  const { category, question, response } = req.body;
+router.get('/user', async (req, res, next) => {
+  const { _id: userId } = req.session.currentUser;
   try {
-    const newOpinion = await Opinion.create({
-      author, category, question, response,
-    });
-    res.status(200).json(newOpinion);
+    const created = await Opinion.find({ author: userId});
+    res.status(200).json(created);
   } catch (error) {
     next(error);
   }
