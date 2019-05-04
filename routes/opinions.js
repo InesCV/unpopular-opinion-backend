@@ -2,7 +2,6 @@
 const express = require('express');
 
 const router = express.Router();
-// const mongoose = require('mongoose');
 
 const Opinion = require('../models/opinion');
 const Response = require('../models/response');
@@ -67,7 +66,7 @@ router.post('/response', async (req, res, next) => {
         return resp.user.equals(userId);
       });
       if (indexHasResponded === -1) {
-        registeredResponse = await Response.findByIdAndUpdate(registeredResponse._id, { $push: { responses: { user: userId, responseBody } } }, { new: true });
+        registeredResponse = await Response.findByIdAndUpdate(registeredResponse._id, { $push: { responses: { user: userId, response: responseBody } } }, { new: true });
       }
     }
 
