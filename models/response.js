@@ -8,18 +8,28 @@ const responseSchema = new Schema({
     type: ObjectId,
     ref: 'Opinion',
   },
-  responses: [
-    {
-      user: {
-        type: ObjectId,
-        ref: 'User',
-      },
-      response: {
-        type: String,
-        enum: ['x', 'y'],
-      },
-    },
-  ],
+  user: {
+    type: ObjectId,
+    ref: 'User',
+  },
+  response: {
+    type: String,
+    enum: ['x', 'y'],
+  },
+
+  // OLD RESPONSE MODEL
+  // responses: [
+  //   {
+  //     user: {
+  //       type: ObjectId,
+  //       ref: 'User',
+  //     },
+  //     response: {
+  //       type: String,
+  //       enum: ['x', 'y'],
+  //     },
+  //   },
+  // ],
 }, {
   timestamps: {
     createdAt: 'created_at',
