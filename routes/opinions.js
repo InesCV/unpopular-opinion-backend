@@ -52,24 +52,10 @@ router.get('/categories', async (req, res, next) => {
 });
 
 router.post('/response', async (req, res, next) => {
-  const { _id: userId } = req.session.currentUser;
-  const { opinionId, responseBody } = req.body;
+  const { _id: user } = req.session.currentUser;
+  const { opinion, response } = req.body;
   try {
-    let registeredResponse = await Response.findOne({ opinion: { $in: [opinionId] } });
-    if (!registeredResponse) {
-      registeredResponse = await Response.create({
-        opinion: opinionId,
-        responses: [{ user: userId, response: responseBody }],
-      });
-    } else {
-      const indexHasResponded = registeredResponse.responses.findIndex((resp) => {
-        return resp.user.equals(userId);
-      });
-      if (indexHasResponded === -1) {
-        registeredResponse = await Response.findByIdAndUpdate(registeredResponse._id, { $push: { responses: { user: userId, response: responseBody } } }, { new: true });
-      }
-    }
-
+    const registeredResponse = await Response.create({ opinion, user, response });
     res.status(200).json({
       message: 'Response registered succesfully',
       registeredResponse,
