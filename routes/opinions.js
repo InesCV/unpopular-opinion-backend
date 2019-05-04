@@ -43,10 +43,11 @@ router.get('/all', async (req, res, next) => {
   }
 });
 
+// TODO Borrar porque no sive para nada (se trata de algo provisional)
 router.get('/user', async (req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   try {
-    const created = await Opinion.find({ author: userId});
+    const created = await Opinion.find({ author: userId });
     res.status(200).json(created);
   } catch (error) {
     next(error);
