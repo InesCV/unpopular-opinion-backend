@@ -32,12 +32,12 @@ router.post('/', async (req, res, next) => {
     case 'category':
       // Find all opinions of an specific category
       opinions = await Opinion.find({ category: query.category }).select('_id');
-      if (opinions.length >= 0) {
+      if (opinions.length > 0) {
         let totalCategory = 0;
         opinions.forEach(async (opinion) => {
           // Find all responses to an specific opinion
           responses = await Response.find({ opinion: opinion._id });
-          if (responses.length >= 0) {
+          if (responses.length > 0) {
             // Find what the user has responded to that specific opinion
             responseIndex = responses.findIndex(resp => resp.user.equals(query.user));
             // Count how many people have responded the same as the user
@@ -83,12 +83,12 @@ router.post('/', async (req, res, next) => {
       };
       // Array to store all the avg for opinion responsed by the user
       responses = [];
-      if (userResponses.length >= 0) {
+      if (userResponses.length > 0) {
         // Calculate statistics for each Opinion that the user has responded
         userResponses.forEach(async (resp) => {
           // Find all responses to this opinion
           userResponseResponses = await Response.find({ opinion: resp.opinion });
-          if (userResponseResponses.length >= 0) {
+          if (userResponseResponses.length > 0) {
             // Count how many people have responded the same as the user
             total = userResponseResponses.reduce((cont, respo) => {
               if (respo.response == resp.response) {
@@ -142,11 +142,11 @@ router.post('/', async (req, res, next) => {
           url: `${process.env.HEROKU}/users/${userResponses[0].user._id}`,
         },
       };
-      if (userResponses.length >= 0) {
+      if (userResponses.length > 0) {
         userResponses.forEach(async (resp) => {
           // Find all responses to this opinion
           userResponseResponses = await Response.find({ opinion: resp.opinion });
-          if (userResponseResponses.length >= 0) {
+          if (userResponseResponses.length > 0) {
             // Count how many people have responded the same as the user
             total = userResponseResponses.reduce((cont, respo) => {
               if (respo.response == resp.response) {
@@ -181,7 +181,7 @@ router.post('/', async (req, res, next) => {
     case 'opinion':
       // Find all responses to an specific opinion
       responses = await Response.find({ opinion: query.opinion }).populate('user');
-      if (responses.length >= 0) {
+      if (responses.length > 0) {
         let xVotes = 0;
         let yVotes = 0;
         const users = [];
@@ -206,8 +206,8 @@ router.post('/', async (req, res, next) => {
 
         // Calculate the % of the people that has responded the same to an specific opinion
         const totalVotes = responses.length;
-        const xAvg = (xVotes / totalVotes) * 100;
-        const yAvg = (yVotes / totalVotes) * 100;
+        const xAvg = Math.round(((xVotes / totalVotes) * 100) * 100) / 100;
+        const yAvg = Math.round(((yVotes / totalVotes) * 100) * 100) / 100;
 
         // Return data.stats object with extended values
         data = {
@@ -233,7 +233,7 @@ router.post('/', async (req, res, next) => {
     case 'opinionRate':
       // Find all responses to an specific opinion
       responses = await Response.find({ opinion: query.opinion });
-      if (responses.length >= 0) {
+      if (responses.length > 0) {
         // Find what the user has responded to that specific opinion
         responseIndex = responses.findIndex(resp => resp.user.equals(query.user));
         // Count how many people have responded the same as the user
@@ -246,7 +246,7 @@ router.post('/', async (req, res, next) => {
           }, 0);
         }
         // Calculate the % of the people that has responded the same as the user
-        total = (total / responses.length) * 100;
+        total = Math.round(((total / responses.length) * 100) * 100) / 100;
         data = {
           message: 'Opinion rate statistics.',
           stats: {
@@ -266,7 +266,7 @@ router.post('/', async (req, res, next) => {
       // Find all responses to an specific opinion
       responses = await Response.find({ opinion: query.opinion });
 
-      if (responses.length >= 0) {
+      if (responses.length > 0) {
         let xVotes = 0;
         let yVotes = 0;
 
@@ -281,8 +281,8 @@ router.post('/', async (req, res, next) => {
 
         // Calculate the % of the people that has responded the same
         const totalVotes = responses.length;
-        const xAvg = (xVotes / totalVotes) * 100;
-        const yAvg = (yVotes / totalVotes) * 100;
+        const xAvg = Math.round(((xVotes / totalVotes) * 100) * 100) / 100;
+        const yAvg = Math.round(((xVotes / totalVotes) * 100) * 100) / 100;
 
         // Return data.stats object with extended values
         data = {
@@ -316,28 +316,3 @@ router.post('/', async (req, res, next) => {
 });
 
 module.exports = router;
-
-
-// const user = {
-//   username: userResponses[0].user.username,
-//   request: {
-//     type: 'GET',
-//     url: `${process.env.HEROKU}/users/${userResponses[0].user._id}`,
-//   },
-// };
-// responses = [];
-// userResponses.forEach((resp) => {
-//   const { _id, author, category } = resp.opinion;
-//   responses.push({
-//     opinion: {
-//        _id,
-//        author,
-//        category,
-//        response: resp.response,
-//        request: {
-//         type: 'GET',
-//         url: `${process.env.HEROKU}/users/${_id}`,
-//       },
-//     },
-//   });
-// });
