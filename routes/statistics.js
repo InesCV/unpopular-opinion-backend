@@ -72,7 +72,7 @@ router.post('/', async (req, res, next) => {
 
     case 'user':
       // Find all responses of a specific user
-      userResponses = await Response.find({ user: query.user }).populate('opinion user');
+      userResponses = await Response.find({ user: query.user });
       // User object with name and link to him profile (to return with json)
       user = {
         username: userResponses[0].user.username,
@@ -133,7 +133,7 @@ router.post('/', async (req, res, next) => {
 
     case 'userRate':
       // Find all responses of a specific user
-      userResponses = await Response.find({ user: query.user }).populate('opinion user');
+      userResponses = await Response.find({ user: query.user }).populate('user');
       // User object with name and link to him profile (to return with json)
       user = {
         username: userResponses[0].user.username,
@@ -143,30 +143,30 @@ router.post('/', async (req, res, next) => {
         },
       };
       if (userResponses.length > 0) {
-        userResponses.forEach(async (resp) => {
+        let totalResponses = 0;
+        for (const resp of userResponses) {
           // Find all responses to this opinion
           userResponseResponses = await Response.find({ opinion: resp.opinion });
-          if (userResponseResponses.length > 0) {
-            // Count how many people have responded the same as the user
-            total = userResponseResponses.reduce((cont, respo) => {
-              if (respo.response == resp.response) {
-                return cont + 1;
-              }
-              return cont;
-            }, 0);
-          }
+          totalResponses+= userResponseResponses.length;
+          // Count how many people have responded the same as the user
+          total = await userResponseResponses.reduce((cont, respo) => {
+            if (respo.response == resp.response) {
+              return cont + 1;
+            }
+            return cont;
+          }, 0);
           // Store how many users have response the same as the user globaly
-          userLike += total;
+          userLike = userLike + total;
           // Store how many users haven't response the same as the user globaly
-          userDislike += (userResponseResponses.length - userLike);
-        });
+          userDislike = userDislike + (userResponseResponses.length - total);
+        };
         // Calculate the % of the people that has responded the same globaly
-        userLike = (userLike / userDislike) * 100;
+        const avg = Math.round(((userLike / totalResponses) * 100) * 100) / 100;
         data = {
           message: 'User rate statistics.',
           stats: {
             user,
-            avg: userLike,
+            avg,
           },
         };
       } else {
