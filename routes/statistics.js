@@ -282,7 +282,7 @@ router.post('/', async (req, res, next) => {
         // Calculate the % of the people that has responded the same
         const totalVotes = responses.length;
         const xAvg = Math.round(((xVotes / totalVotes) * 100) * 100) / 100;
-        const yAvg = Math.round(((xVotes / totalVotes) * 100) * 100) / 100;
+        const yAvg = Math.round(((yVotes / totalVotes) * 100) * 100) / 100;
 
         // Return data.stats object with extended values
         data = {
