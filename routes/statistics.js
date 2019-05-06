@@ -85,7 +85,7 @@ router.post('/', async (req, res, next) => {
       responses = [];
       if (userResponses.length > 0) {
         // Calculate statistics for each Opinion that the user has responded
-        userResponses.forEach(async (resp) => {
+        for (const resp of userResponses) {
           // Find all responses to this opinion
           userResponseResponses = await Response.find({ opinion: resp.opinion });
           if (userResponseResponses.length > 0) {
@@ -97,7 +97,7 @@ router.post('/', async (req, res, next) => {
               return cont;
             }, 0);
             // Calculate the % of the people that has responded the same as the user
-            total = (total / userResponseResponses.length) * 100;
+            total = Math.round(((total / userResponseResponses.length) * 100) * 100) / 100;
           }
           // Take basic values of the Opinion to make the response object to store
           const { _id, author, category } = resp.opinion;
@@ -114,7 +114,7 @@ router.post('/', async (req, res, next) => {
               },
             },
           });
-        });
+        };
         data = {
           message: 'User response statistics.',
           stats: {
@@ -144,6 +144,7 @@ router.post('/', async (req, res, next) => {
       };
       if (userResponses.length > 0) {
         let totalResponses = 0;
+        // Use for of loop to control the forEach async
         for (const resp of userResponses) {
           // Find all responses to this opinion
           userResponseResponses = await Response.find({ opinion: resp.opinion });
