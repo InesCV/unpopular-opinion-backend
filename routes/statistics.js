@@ -206,6 +206,7 @@ router.post('/', async (req, res, next) => {
 
         // Calculate the % of the people that has responded the same to an specific opinion
         const totalVotes = responses.length;
+        // Round avg to 2 decimals
         const xAvg = Math.round(((xVotes / totalVotes) * 100) * 100) / 100;
         const yAvg = Math.round(((yVotes / totalVotes) * 100) * 100) / 100;
 
