@@ -34,7 +34,7 @@ router.post('/', async (req, res, next) => {
       opinions = await Opinion.find({ category: query.category }).select('_id');
       if (opinions.length > 0) {
         let totalCategory = 0;
-        opinions.forEach(async (opinion) => {
+        for (const opinion of opinions) {
           // Find all responses to an specific opinion
           responses = await Response.find({ opinion: opinion._id });
           if (responses.length > 0) {
@@ -52,9 +52,9 @@ router.post('/', async (req, res, next) => {
               totalCategory = (total / responses.length);
             }
           }
-        });
+        };
         // Calculate the % of each response to this category
-        totalCategory = (totalCategory / opinions.length) * 100;
+        totalCategory = Math.round(((totalCategory / opinions.length) * 100) * 100) / 100;
         data = {
           message: 'Category statistics.',
           stats: {
