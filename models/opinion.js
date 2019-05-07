@@ -41,30 +41,18 @@ const opinionSchema = new Schema({
   //   lat: Number,
   //   long: Number
   // },
-  // reported: {
-  //   isReported: {
-  //     type: Boolean,
-  //     default: false,
-  //   },
-  //   isRevised: {
-  //     type: Boolean,
-  //     default: false,
-  //   },
-  //   by: {
-  //     type: Array,
-  //     ref: 'User',
-  //   },
-  // },
-  // modified: {
-  //   isModified: {
-  //     type: Boolean,
-  //     default: false,
-  //   },
-  //   isRevised: {
-  //     type: Boolean,
-  //     default: false,
-  //   }
-  // }
+  reported: {
+    type: ObjectId,
+    ref: 'Reported',
+  },
+  isRevised: {
+    type: Boolean,
+    default: false,
+  },
+  isUpdated: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: {
     createdAt: 'created_at',
