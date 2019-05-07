@@ -6,10 +6,19 @@ const User = require('../models/user');
 const Opinion = require('../models/opinion');
 const Response = require('../models/response');
 
-const { isLoggedIn } = require('../helpers/middlewares');
+// const { isLoggedIn } = require('../helpers/middlewares');
+
+// router.use(isLoggedIn('user'));
 
 router.get('/:id', async (req, res, next) => {
-  const { id: user } = req.params;
+  let user = null;
+  console.log(req.session);
+
+  if (req.params.id) {
+    user = req.params.id;
+  } else {
+    user = req.session.currentUser._id;
+  }
 
   try {
     const { username, description, avatar } = await User.findById(user);
