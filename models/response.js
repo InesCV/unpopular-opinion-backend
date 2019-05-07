@@ -16,20 +16,6 @@ const responseSchema = new Schema({
     type: String,
     enum: ['x', 'y'],
   },
-
-  // OLD RESPONSE MODEL
-  // responses: [
-  //   {
-  //     user: {
-  //       type: ObjectId,
-  //       ref: 'User',
-  //     },
-  //     response: {
-  //       type: String,
-  //       enum: ['x', 'y'],
-  //     },
-  //   },
-  // ],
 }, {
   timestamps: {
     createdAt: 'created_at',

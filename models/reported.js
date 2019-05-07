@@ -8,7 +8,7 @@ const reportedSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  isRevised: {
+  isChecked: {
     type: Boolean,
     default: false,
   },
@@ -18,7 +18,7 @@ const reportedSchema = new Schema({
       ref: 'User',
     },
   ],
-  revisedBy: {
+  checkedBy: {
     type: ObjectId,
     ref: 'User',
   },

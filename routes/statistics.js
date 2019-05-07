@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-loop-func */
 const express = require('express');
 
 const router = express.Router();
@@ -21,8 +23,8 @@ router.post('/', async (req, res, next) => {
   let userResponses = 0;
   let userResponseResponses = null;
   let user = null;
-  let userLike = 0;
-  let userDislike = 0;
+  let likeUser = 0;
+  let unlikeUser = 0;
 
   if (!Object.prototype.hasOwnProperty.call(query, 'user')) {
     query.user = req.session.currentUser._id;
@@ -49,21 +51,35 @@ router.post('/', async (req, res, next) => {
                 return cont;
               }, 0);
               // Calculate the % of the people that has responded the same as the user for this opinion
-              totalCategory = (total / responses.length);
+              likeUser += total;
+              unlikeUser += (responses.length - likeUser);
+              totalCategory += responses.length;
             }
           }
         };
         // Calculate the % of each response to this category
-        totalCategory = Math.round(((totalCategory / opinions.length) * 100) * 100) / 100;
-        data = {
-          message: 'Category statistics.',
-          stats: {
-            avg: totalCategory,
-          },
-        };
+        const result = Math.round(((likeUser / totalCategory) * 100) * 100) / 100;
+
+        if (likeUser === 0) {
+          data = {
+            message: `User don't have responded any Opinion of ${query.category}`,
+            stats: {
+              avg: null,
+            },
+          };
+        } else {
+          data = {
+            message: `${query.category} statistics.`,
+            stats: {
+              avg: result,
+              totalOpinions: totalCategory,
+            },
+          };
+        }
+
       } else {
         data = {
-          message: "Sorry, this Category doesn't have any response yet.",
+          message: `Sorry, ${query.category} doesn't have any response yet.`,
           stats,
         };
       }
@@ -72,7 +88,7 @@ router.post('/', async (req, res, next) => {
 
     case 'user':
       // Find all responses of a specific user
-      userResponses = await Response.find({ user: query.user });
+      userResponses = await Response.find({ user: query.user }).populate('opinion user');
       // User object with name and link to him profile (to return with json)
       user = {
         username: userResponses[0].user.username,
@@ -108,6 +124,7 @@ router.post('/', async (req, res, next) => {
               author,
               category,
               avg: total, // How many people have responded the same as the user for this Opinion
+              totalResponses: userResponseResponses.length,
               request: {
                 type: 'GET',
                 url: `${process.env.HEROKU}/opinions/${_id}`,
@@ -116,7 +133,7 @@ router.post('/', async (req, res, next) => {
           });
         };
         data = {
-          message: 'User response statistics.',
+          message: `${user.username} response statistics.`,
           stats: {
             user,
             responses,
@@ -124,7 +141,7 @@ router.post('/', async (req, res, next) => {
         };
       } else {
         data = {
-          message: "Sorry, this User doesn't have response yet.",
+          message: `Sorry, ${user.username} doesn't have response yet.`,
           stats,
         };
       }
@@ -147,24 +164,24 @@ router.post('/', async (req, res, next) => {
         // Use for of loop to control the forEach async
         for (const resp of userResponses) {
           // Find all responses to this opinion
-          userResponseResponses = await Response.find({ opinion: resp.opinion });
-          totalResponses+= userResponseResponses.length;
+          userResponseResponses = Response.find({ opinion: resp.opinion });
+          totalResponses += userResponseResponses.length;
           // Count how many people have responded the same as the user
-          total = await userResponseResponses.reduce((cont, respo) => {
+          total = userResponseResponses.reduce((cont, respo) => {
             if (respo.response == resp.response) {
               return cont + 1;
             }
             return cont;
           }, 0);
           // Store how many users have response the same as the user globaly
-          userLike = userLike + total;
+          likeUser += total;
           // Store how many users haven't response the same as the user globaly
-          userDislike = userDislike + (userResponseResponses.length - total);
+          unlikeUser += (userResponseResponses.length - total);
         };
         // Calculate the % of the people that has responded the same globaly
-        const avg = Math.round(((userLike / totalResponses) * 100) * 100) / 100;
+        const avg = Math.round(((likeUser / totalResponses) * 100) * 100) / 100;
         data = {
-          message: 'User rate statistics.',
+          message: `${user.username} rate statistics.`,
           stats: {
             user,
             avg,
@@ -172,7 +189,7 @@ router.post('/', async (req, res, next) => {
         };
       } else {
         data = {
-          message: "Sorry, this User doesn't have response yet.",
+          message: `Sorry, ${user.username} doesn't have response yet.`,
           stats,
         };
       }
@@ -308,7 +325,7 @@ router.post('/', async (req, res, next) => {
 
     default:
       data = {
-        message: "Opinion statistic doesn't exist.",
+        message: `Sorry, ${query.type} statistic doesn't exist.`,
         stats,
       };
       res.status(404).json(data);

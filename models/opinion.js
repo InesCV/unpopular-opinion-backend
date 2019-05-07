@@ -45,7 +45,7 @@ const opinionSchema = new Schema({
     type: ObjectId,
     ref: 'Reported',
   },
-  isRevised: {
+  isChecked: {
     type: Boolean,
     default: false,
   },

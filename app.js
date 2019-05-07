@@ -13,7 +13,7 @@ const auth = require('./routes/auth');
 const opinions = require('./routes/opinions');
 const users = require('./routes/users');
 const statistics = require('./routes/statistics');
-const admin = require('./routes/admin');
+// sconst admin = require('./routes/admin');
 
 mongoose
   .connect(process.env.MONGODB_URI, {
@@ -70,7 +70,7 @@ app.use('/auth', auth);
 app.use('/opinions', opinions);
 app.use('/users', users);
 app.use('/statistics', statistics);
-app.use('/admin', admin);
+// app.use('/admin', admin);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
