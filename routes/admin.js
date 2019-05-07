@@ -15,7 +15,9 @@ router.use(isLoggedIn('admin'));
 router.use('/reported', reported);
 
 router.get('/', async (req, res, next) => {
-  
+  res.status(200).json({
+    msg: 'estoy en raiz de admin',
+  });
 });
 
 module.exports = router;

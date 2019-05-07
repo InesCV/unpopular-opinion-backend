@@ -4,9 +4,9 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
 
 const reportedSchema = new Schema({
-  isReported: {
-    type: Boolean,
-    default: false,
+  opinion: {
+    type: ObjectId,
+    ref: 'Opinion',
   },
   isChecked: {
     type: Boolean,

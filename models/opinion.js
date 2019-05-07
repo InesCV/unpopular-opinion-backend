@@ -41,9 +41,9 @@ const opinionSchema = new Schema({
   //   lat: Number,
   //   long: Number
   // },
-  reported: {
-    type: ObjectId,
-    ref: 'Reported',
+  isReported: {
+    type: Boolean,
+    default: false,
   },
   isChecked: {
     type: Boolean,

@@ -13,33 +13,51 @@ router.use(isLoggedIn('admin'));
 
 router.get('/', async (req, res, next) => {
   const { _id: adminId } = req.session.currentUser;
+
   try {
-    const reported = Reported.find({ isChecked: 'false' }).populate('reportedBy');
-    res.status(200).json({
-      data: {
-        message: "Reported Opinions to check.",
+    const reported = await Opinion.find({ isReported: true, isChecked: false }).populate('author');
+    let data = {
+      message: 'No reported Opinions to check.',
+      reported: [],
+    };
+    if (reported.length > 0) {
+      data = {
+        message: 'Reported Opinions to check.',
         reported,
-      },
-    });
+      };
+    }
+    res.status(200).json(data);
   } catch (error) {
     next(error);
   }
 });
 
-router.put('/:id', async (req, res, next) => {
+router.put('/', async (req, res, next) => {
   const { _id: adminId } = req.session.currentUser;
-  const { reportedId } = req.params;
+  const update = req.body;
 
-  try {
-    const reported = Reported.find({ isChecked: 'false' }).populate('reportedBy');
-    res.status(200).json({
-      data: {
-        message: "Reported Opinions to check.",
-        reported,
-      },
-    });
-  } catch (error) {
-    next(error);
+  if (update.opinion === '' || update.username === '' || update.description === '') {
+    let data = {
+      message: 'No empty fields allowed.',
+      updatedOpinion: [],
+    };
+  } else {
+    try {
+      const reported = await Opinion.find({ isReported: true, isChecked: false }).populate('author');
+      let data = {
+        message: 'No reported Opinions to check.',
+        reported: [],
+      };
+      if (reported.length > 0) {
+        data = {
+          message: 'Reported Opinions to check.',
+          reported,
+        };
+      }
+      res.status(200).json(data);
+    } catch (error) {
+      next(error);
+    }
   }
 });
 
