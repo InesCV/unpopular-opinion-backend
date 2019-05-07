@@ -3,8 +3,6 @@ const express = require('express');
 const router = express.Router();
 
 const User = require('../models/user');
-const Opinion = require('../models/opinion');
-const Response = require('../models/response');
 
 const reported = require('./reported');
 
@@ -14,10 +12,19 @@ router.use(isLoggedIn('admin'));
 
 router.use('/reported', reported);
 
-router.get('/', async (req, res, next) => {
-  res.status(200).json({
-    msg: 'estoy en raiz de admin',
-  });
+router.delete('/user/:userId', async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    const data = {
+      message: 'Deleted user succesfully.',
+      deletedUser,
+    };
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

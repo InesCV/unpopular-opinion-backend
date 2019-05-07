@@ -33,31 +33,42 @@ router.get('/', async (req, res, next) => {
 });
 
 router.put('/', async (req, res, next) => {
-  const { _id: adminId } = req.session.currentUser;
-  const update = req.body;
+  let { opinion, isChecked } = req.body;
+  let data = null;
 
-  if (update.opinion === '' || update.username === '' || update.description === '') {
-    let data = {
+  if (opinion === '' || isChecked === '') {
+    data = {
       message: 'No empty fields allowed.',
       updatedOpinion: [],
     };
   } else {
     try {
-      const reported = await Opinion.find({ isReported: true, isChecked: false }).populate('author');
-      let data = {
-        message: 'No reported Opinions to check.',
-        reported: [],
+      await Reported.findOneAndUpdate({ opinion }, { isChecked }, { new: true });
+      const updatedOpinion = await Opinion.findByIdAndUpdate(opinion, { isChecked }, { new: true });
+      data = {
+        message: 'Report succesfully updated.',
+        updatedOpinion,
       };
-      if (reported.length > 0) {
-        data = {
-          message: 'Reported Opinions to check.',
-          reported,
-        };
-      }
-      res.status(200).json(data);
     } catch (error) {
       next(error);
     }
+  }
+  res.status(200).json(data);
+});
+
+router.delete('/:opinionId', async (req, res, next) => {
+  const { opinionId } = req.params;
+
+  try {
+    await Reported.remove({ opinion: opinionId });
+    const deletedOpinion = await Opinion.findByIdAndDelete(opinionId);
+    const data = {
+      message: 'Deleted opinion succesfully.',
+      deletedOpinion,
+    };
+    res.status(200).json(data);
+  } catch (error) {
+    next(error);
   }
 });
 
