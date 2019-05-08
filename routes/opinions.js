@@ -9,12 +9,13 @@ const { isLoggedIn } = require('../helpers/middlewares');
 
 router.use(isLoggedIn('user'));
 
+
 router.get('/', async (req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   try {
     const responsed = await Response.find({ user: userId }).select('opinion -_id');
     const filter = responsed.map(e => e.opinion);
-    const filteredOpinions = await Opinion.find({ _id: { $nin: filter } }).populate('author');
+    const filteredOpinions = await Opinion.find({ _id: { $nin: filter } });
     res.status(200).json(filteredOpinions);
   } catch (error) {
     next(error);
