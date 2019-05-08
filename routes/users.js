@@ -4,11 +4,10 @@ const router = express.Router();
 
 const User = require('../models/user');
 const Opinion = require('../models/opinion');
-const Response = require('../models/response');
 
-// const { isLoggedIn } = require('../helpers/middlewares');
+const { isLoggedIn } = require('../helpers/middlewares');
 
-// router.use(isLoggedIn('user'));
+router.use(isLoggedIn('user'));
 
 router.get('/:id', async (req, res, next) => {
   let user = null;
