@@ -9,16 +9,14 @@ const { isLoggedIn } = require('../helpers/middlewares');
 
 router.use(isLoggedIn('user'));
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id?', async (req, res, next) => {
   let user = null;
-  console.log(req.session);
-
+  
   if (req.params.id) {
     user = req.params.id;
   } else {
     user = req.session.currentUser._id;
   }
-
   try {
     const { username, description, avatar } = await User.findById(user);
     const opinions = await Opinion.find({ author: { $in: [user] } }).select('question response -_id');
