@@ -1,10 +1,15 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable max-len */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-case-declarations */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-loop-func */
 const express = require('express');
 
 const router = express.Router();
 
-// const User = require('../models/user');
+const User = require('../models/user');
 const Opinion = require('../models/opinion');
 const Response = require('../models/response');
 
@@ -24,7 +29,7 @@ router.post('/', async (req, res, next) => {
   let userResponseResponses = null;
   let user = null;
   let likeUser = 0;
-  let unlikeUser = 0;
+  let avg = 0;
 
   if (!Object.prototype.hasOwnProperty.call(query, 'user')) {
     query.user = req.session.currentUser._id;
@@ -52,11 +57,10 @@ router.post('/', async (req, res, next) => {
               }, 0);
               // Calculate the % of the people that has responded the same as the user for this opinion
               likeUser += total;
-              unlikeUser += (responses.length - likeUser);
               totalCategory += responses.length;
             }
           }
-        };
+        }
         // Calculate the % of each response to this category
         const result = Math.round(((likeUser / totalCategory) * 100) * 100) / 100;
 
@@ -76,10 +80,82 @@ router.post('/', async (req, res, next) => {
             },
           };
         }
-
       } else {
         data = {
           message: `Sorry, ${query.category} doesn't have any response yet.`,
+          stats,
+        };
+      }
+
+      break;
+
+    case 'categoryRate':
+      // Create an array of categories
+      const categories = Opinion.schema.path('category').enumValues;
+      // Find user data
+      user = await User.findById(query.user);
+      // Array to store each category with the avg
+      avg = [];
+      if (categories) {
+        for (const category of categories) {
+          let totalCategory = 0;
+          likeUser = 0;
+          // Find all opinions of a specific category
+          opinions = await Opinion.find({ category }).select('_id');
+          if (opinions.length > 0) {
+            // Traverse opinions array
+            for (const opinion of opinions) {
+              // Find all the responses for a specific opinion
+              responses = await Response.find({ opinion });
+              if (responses.length > 0) {
+                // Find what the user has responded to that specific opinion
+                responseIndex = responses.findIndex(resp => resp.user.equals(query.user));
+                // Count how many people have responded the same as the user
+                if (responseIndex >= 0) {
+                  total = responses.reduce((cont, resp) => {
+                    if (resp.response == responses[responseIndex].response) {
+                      return cont + 1;
+                    }
+                    return cont;
+                  }, 0);
+                  // Acumulate the total of people that has responded the same as the user for this opinion
+                  likeUser += total;
+                  totalCategory += responses.length;
+                }
+              }
+            }
+            // Calculate the % of the user to this category
+            const result = Math.round(((likeUser / totalCategory) * 100) * 100) / 100;
+            // Add stat to avg array
+            if (likeUser > 0) {
+              avg.push({
+                category,
+                percent: result,
+                totalOpinions: totalCategory,
+              });
+            }
+          }
+        }
+        if (avg.length > 0) {
+          data = {
+            message: `${user.username} statistics per category.`,
+            stats: {
+              avg,
+            },
+            request: {
+              type: 'GET',
+              url: `${process.env.HEROKU}/opinions/${query.user}`,
+            },
+          };
+        } else {
+          data = {
+            message: `Sorry, ${user.username} doesn't have response yet.`,
+            stats,
+          };
+        }
+      } else {
+        data = {
+          message: "Sorry, there aren't any categories in the API.",
           stats,
         };
       }
@@ -131,7 +207,7 @@ router.post('/', async (req, res, next) => {
               },
             },
           });
-        };
+        }
         data = {
           message: `${user.username} response statistics.`,
           stats: {
@@ -175,11 +251,9 @@ router.post('/', async (req, res, next) => {
           }, 0);
           // Store how many users have response the same as the user globaly
           likeUser += total;
-          // Store how many users haven't response the same as the user globaly
-          unlikeUser += (userResponseResponses.length - total);
-        };
+        }
         // Calculate the % of the people that has responded the same globaly
-        const avg = Math.round(((likeUser / totalResponses) * 100) * 100) / 100;
+        avg = Math.round(((likeUser / totalResponses) * 100) * 100) / 100;
         data = {
           message: `${user.username} rate statistics.`,
           stats: {
@@ -322,6 +396,30 @@ router.post('/', async (req, res, next) => {
       }
 
       break;
+
+    // case 'match':
+    //   // Find all responses of a specific user
+    //   userResponses = await Response.find({ user: { query.user, query.withUser }).select('opinion -_id');
+    //   // User object with name and link to him profile (to return with json)
+    //   user = {
+    //     username: userResponses[0].user.username,
+    //     request: {
+    //       type: 'GET',
+    //       url: `${process.env.HEROKU}/users/${userResponses[0].user._id}`,
+    //     },
+    //   };
+    //   // Array to store all the avg for opinion responsed by the user
+    //   responses = [];
+    //   if (userResponses.length > 0) {
+        
+    //   } else {
+    //     data = {
+    //       message: `Sorry, ${user.username} doesn't have response yet.`,
+    //       stats,
+    //     };
+    //   }
+
+    //   break;
 
     default:
       data = {
