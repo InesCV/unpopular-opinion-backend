@@ -15,7 +15,8 @@ router.get('/', async (req, res, next) => {
   try {
     const responsed = await Response.find({ user: userId }).select('opinion -_id');
     const filter = responsed.map(e => e.opinion);
-    const filteredOpinions = await Opinion.find({ _id: { $nin: filter } }).populate('author');
+    let filteredOpinions = await Opinion.find({ _id: { $nin: filter } }).populate('author');
+    filteredOpinions = filteredOpinions.sort(() => Math.random() - 0.5);
     res.status(200).json(filteredOpinions);
   } catch (error) {
     next(error);
