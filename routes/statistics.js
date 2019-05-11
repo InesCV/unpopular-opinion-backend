@@ -240,7 +240,7 @@ router.post('/', async (req, res, next) => {
         // Use for of loop to control the forEach async
         for (const resp of userResponses) {
           // Find all responses to this opinion
-          userResponseResponses = Response.find({ opinion: resp.opinion });
+          userResponseResponses = await Response.find({ opinion: resp.opinion });
           totalResponses += userResponseResponses.length;
           // Count how many people have responded the same as the user
           total = userResponseResponses.reduce((cont, respo) => {
@@ -397,29 +397,85 @@ router.post('/', async (req, res, next) => {
 
       break;
 
-    // case 'match':
-    //   // Find all responses of a specific user
-    //   userResponses = await Response.find({ user: { query.user, query.withUser }).select('opinion -_id');
-    //   // User object with name and link to him profile (to return with json)
-    //   user = {
-    //     username: userResponses[0].user.username,
-    //     request: {
-    //       type: 'GET',
-    //       url: `${process.env.HEROKU}/users/${userResponses[0].user._id}`,
-    //     },
-    //   };
-    //   // Array to store all the avg for opinion responsed by the user
-    //   responses = [];
-    //   if (userResponses.length > 0) {
-        
-    //   } else {
-    //     data = {
-    //       message: `Sorry, ${user.username} doesn't have response yet.`,
-    //       stats,
-    //     };
-    //   }
+    case 'matchRate':
+      // Users objects with name and link to him profile (to return with json)
+      let userData = await User.findById(query.user);
+      user = {
+        username: userData.username,
+        request: {
+          type: 'GET',
+          url: `${process.env.HEROKU}/users/${userData._id}`,
+        },
+      };
+      userData = await User.findById(query.userMatch);
+      const userMatch = {
+        username: userData.username,
+        request: {
+          type: 'GET',
+          url: `${process.env.HEROKU}/users/${userData._id}`,
+        },
+      };
+      // Find all responses of user
+      let aux = await Response.find({ user: query.user }).select('opinion -_id');
+      userResponses = aux.map(({ opinion }) => String(opinion));
+      if (userResponses.length > 0) {
+        // Find all responses of userMatch
+        aux = await Response.find({ user: query.userMatch }).select('opinion -_id');
+        const userMatchResponses = aux.map(({ opinion }) => String(opinion));
 
-    //   break;
+        if (userMatchResponses.length > 0) {
+          // Find intersection between the two arrays
+          const intersection = userResponses.filter(response => userMatchResponses.includes(response));
+          if (intersection.length > 0) {
+            // Find all the opinions responded by both users
+            const matchingResponses = await Response
+              .find({
+                $and: [
+                  { opinion: { $in: intersection } },
+                  {
+                    $or: [
+                      { user: query.user },
+                      { user: query.userMatch },
+                    ],
+                  },
+                ],
+              });
+
+            // Count conincidences between users responses
+            let matches = 0;
+            intersection.forEach((opinion) => {
+              const auxi = matchingResponses.filter(resp => resp.opinion == opinion);
+              if (auxi[0].response === auxi[1].response) {
+                matches++;
+              }
+            });
+
+            // Calculate the % of match between users
+            avg = Math.round(((matches / intersection.length) * 100) * 100) / 100;
+
+            data = {
+              message: `${user.username} & ${userMatch.username} affinity.`,
+              avg,
+            };
+          } else {
+            data = {
+              message: "Sorry, there aren't matching responses.",
+              stats,
+            };
+          }
+        } else {
+          data = {
+            message: `Sorry, ${userMatch.username} doesn't have response yet.`,
+            stats,
+          };
+        }
+      } else {
+        data = {
+          message: `Sorry, ${user.username} doesn't have response yet.`,
+          stats,
+        };
+      }
+      break;
 
     default:
       data = {
