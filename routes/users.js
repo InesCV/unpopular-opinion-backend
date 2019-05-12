@@ -18,12 +18,13 @@ router.get('/:id?', async (req, res, next) => {
     user = req.session.currentUser._id;
   }
   try {
-    const { username, description, avatar } = await User.findById(user);
+    const { username, description, avatar, _id } = await User.findById(user);
     const opinions = await Opinion.find({ author: { $in: [user] } }).select('question response -_id');
     res.status(200).json({
       message: 'User data returned succesfully',
       user: {
         username,
+        _id,
         description,
         avatar,
         opinions,
