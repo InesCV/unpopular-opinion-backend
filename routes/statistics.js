@@ -227,45 +227,54 @@ router.post('/', async (req, res, next) => {
     case 'userRate':
       // Find all responses of a specific user
       userResponses = await Response.find({ user: query.user }).populate('user');
-      // User object with name and link to him profile (to return with json)
-      user = {
-        username: userResponses[0].user.username,
-        request: {
-          type: 'GET',
-          url: `${process.env.HEROKU}/users/${userResponses[0].user._id}`,
-        },
-      };
-      if (userResponses.length > 0) {
-        let totalResponses = 0;
-        // Use for of loop to control the forEach async
-        for (const resp of userResponses) {
-          // Find all responses to this opinion
-          userResponseResponses = await Response.find({ opinion: resp.opinion });
-          totalResponses += userResponseResponses.length;
-          // Count how many people have responded the same as the user
-          total = userResponseResponses.reduce((cont, respo) => {
-            if (respo.response == resp.response) {
-              return cont + 1;
-            }
-            return cont;
-          }, 0);
-          // Store how many users have response the same as the user globaly
-          likeUser += total;
-        }
-        // Calculate the % of the people that has responded the same globaly
-        avg = Math.round(((likeUser / totalResponses) * 100) * 100) / 100;
+      // If it hasn't responded to any opinion
+      if (userResponses.length === 0) {
         data = {
-          message: `${user.username} rate statistics.`,
-          stats: {
-            user,
-            avg,
-          },
-        };
-      } else {
-        data = {
-          message: `Sorry, ${user.username} doesn't have response yet.`,
+          message: "Sorry, the user hasn't responded any opinion yet.",
           stats,
         };
+        console.log(stats);
+      } else {
+        // User object with name and link to him profile (to return with json)
+        user = {
+          username: userResponses[0].user.username,
+          request: {
+            type: 'GET',
+            url: `${process.env.HEROKU}/users/${userResponses[0].user._id}`,
+          },
+        };
+        if (userResponses.length > 0) {
+          let totalResponses = 0;
+          // Use for of loop to control the forEach async
+          for (const resp of userResponses) {
+            // Find all responses to this opinion
+            userResponseResponses = await Response.find({ opinion: resp.opinion });
+            totalResponses += userResponseResponses.length;
+            // Count how many people have responded the same as the user
+            total = userResponseResponses.reduce((cont, respo) => {
+              if (respo.response == resp.response) {
+                return cont + 1;
+              }
+              return cont;
+            }, 0);
+            // Store how many users have response the same as the user globaly
+            likeUser += total;
+          }
+          // Calculate the % of the people that has responded the same globaly
+          avg = Math.round(((likeUser / totalResponses) * 100) * 100) / 100;
+          data = {
+            message: `${user.username} rate statistics.`,
+            stats: {
+              user,
+              avg,
+            },
+          };
+        } else {
+          data = {
+            message: `Sorry, ${user.username} doesn't have response yet.`,
+            stats,
+          };
+        }
       }
 
       break;
