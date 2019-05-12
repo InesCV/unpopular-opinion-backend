@@ -11,7 +11,7 @@ router.use(isLoggedIn('user'));
 
 router.get('/:id?', async (req, res, next) => {
   let user = null;
-  
+
   if (req.params.id) {
     user = req.params.id;
   } else {
@@ -32,6 +32,29 @@ router.get('/:id?', async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+});
+
+router.put('/', async (req, res, next) => {
+  const userId = req.session.currentUser._id;
+  const { username, description, avatar } = req.body;
+
+  if (username === '' || description === '') {
+    req.flash('error', 'No empty fields allowed.');
+    res.status(400).json({
+      message: 'No empty fields alowed.',
+      user: null,
+    });
+  } else {
+    try {
+      const user = await User.findByIdAndUpdate(userId, { username, description, avatar }, { new: true });
+      res.status(200).json({
+        message: 'User profile updated succesfully',
+        user,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 });
 
