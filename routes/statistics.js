@@ -233,7 +233,6 @@ router.post('/', async (req, res, next) => {
           message: "Sorry, the user hasn't responded any opinion yet.",
           stats,
         };
-        console.log(stats);
       } else {
         // User object with name and link to him profile (to return with json)
         user = {
