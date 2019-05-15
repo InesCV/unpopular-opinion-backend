@@ -25,10 +25,10 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   const { _id: author } = req.session.currentUser;
-  const { category, question, response } = req.body;
+  const { photo, category, question, response } = req.body;
   try {
     const newOpinion = await Opinion.create({
-      author, category, question, response,
+      author, category, question, response, photo,
     });
     res.status(200).json(newOpinion);
   } catch (error) {
