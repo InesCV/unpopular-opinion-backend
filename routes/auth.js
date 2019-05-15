@@ -10,9 +10,10 @@ const {
   isLoggedIn,
   isNotLoggedIn,
   validationLoggin,
+  validationSignup,
 } = require('../helpers/middlewares');
 
-router.get('/me', isLoggedIn("user"), (req, res, next) => {
+router.get('/me', isLoggedIn('user'), (req, res, next) => {
   res.json(req.session.currentUser);
 });
 
@@ -25,12 +26,12 @@ router.post(
     try {
       const user = await User.findOne({ username });
       if (!user) {
-        next(createError(404));
+        next(createError(404, "User doesn't exist"));
       } else if (bcrypt.compareSync(password, user.password)) {
         req.session.currentUser = user;
         return res.status(200).json(user);
       } else {
-        next(createError(401));
+        next(createError(401, "User couldn't be created"));
       }
     } catch (error) {
       next(error);
@@ -41,36 +42,41 @@ router.post(
 router.post(
   '/signup',
   isNotLoggedIn(),
-  validationLoggin(),
+  validationSignup(),
   async (req, res, next) => {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
 
     try {
-      const user = await User.findOne({ username }, 'username');
+      // i: case insensitive
+      // s: dot (.), blank spaces or new line
+      // \b ... \b: solo permite cadenas que sean igual a "username"
+      const user = await User.findOne({ $or: [{ username: new RegExp('\\b' + username + '\\b', 'is') }, { email: new RegExp('\\b' + email + '\\b', 'is') }] }, 'username');
+
       if (user) {
-        return next(createError(422));
-      } else {
-        const salt = bcrypt.genSaltSync(10);
-        const hashPass = bcrypt.hashSync(password, salt);
-        const newUser = await User.create({ username, password: hashPass });
-        req.session.currentUser = newUser;
-        res.status(200).json(newUser);
+        return next(createError(422, 'User or email already exist'));
       }
+      const salt = bcrypt.genSaltSync(10);
+      const hashPass = bcrypt.hashSync(password, salt);
+      const newUser = await User.create({ username, password: hashPass, email });
+      req.session.currentUser = newUser;
+      res.status(200).json(newUser);
     } catch (error) {
       next(error);
     }
   },
 );
 
-router.post('/logout', isLoggedIn("user"), (req, res, next) => {
+router.post('/logout', isLoggedIn('user'), (req, res, next) => {
   req.session.destroy();
   return res.status(204).send();
 });
 
-router.get('/private', isLoggedIn("user"), (req, res, next) => {
+router.get('/private', isLoggedIn('user'), (req, res, next) => {
   res.status(200).json({
     message: 'This is a private message',
   });
 });
 
 module.exports = router;
+
+//jdej@jdej.com
