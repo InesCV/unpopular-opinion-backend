@@ -1,4 +1,5 @@
 const express = require('express');
+const createError = require('http-errors');
 
 const router = express.Router();
 
@@ -39,15 +40,18 @@ router.put('/', async (req, res, next) => {
   const userId = req.session.currentUser._id;
   const { username, description, avatar } = req.body;
 
-  if (username === '' || description === '') {
-    req.flash('error', 'No empty fields allowed.');
-    res.status(400).json({
-      message: 'No empty fields alowed.',
-      user: null,
-    });
+  if (!username || !description) {
+    next(createError(422, 'Empty files not allowed.'));
   } else {
     try {
-      const user = await User.findByIdAndUpdate(userId, { username, description, avatar }, { new: true });
+      // i: case insensitive
+      // s: dot (.), blank spaces or new line
+      // \b ... \b: solo permite cadenas que sean igual a "username"
+      let user = await User.findOne({ username: new RegExp('\\b' + username + '\\b', 'is') }, 'username');
+      if (user) {
+        return next(createError(422, 'Username already exist.'));
+      }
+      user = await User.findByIdAndUpdate(userId, { username, description, avatar }, { new: true });
       res.status(200).json({
         message: 'User profile updated succesfully',
         user,
