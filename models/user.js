@@ -26,6 +26,7 @@ const userSchema = new Schema({
   },
 });
 
+// Build an index of users with position
 userSchema.index({ position: '2dsphere' });
 
 module.exports = mongoose.model('User', userSchema);

@@ -89,12 +89,20 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-// Configuration of websockets
+/**
+ * Sockets configuration
+ */
+
 const SocketIO = require('socket.io');
 
 const io = SocketIO(server);
+
+// Array holding sockets associated with userIds
+let sockets = [];
+
 io.on('connection', (socket) => {
-  console.log('new connection', socket.id);
+  // Send custom welcome message to one client connected
+  io.to(`${socket.id}`).emit('message', `Welcome to UOP! ${socket.id}`);
 
   socket.on('chat:message', (msg) => {
     console.log(msg.currentUser);
