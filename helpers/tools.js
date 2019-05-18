@@ -14,27 +14,25 @@ module.exports = {
     }
   },
 
-  updateAllUserPositions: async (sockets) => {
-    for (const userSocket of sockets) {
-      updateUserPosition(userSocket.id, userSocket.position);
-    }
-  },
-
   findNearUopers: async (userId) => {
-    const user = await User.findOne({ _id: userId });
-
-    const uopers = await User.find({
-      position: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [user.position.coordinates[0], user.position.coordinates[1]],
+    try {
+      const user = await User.findOne({ _id: userId });
+  
+      const uopers = await User.find({
+        position: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [user.position.coordinates[0], user.position.coordinates[1]],
+            },
+            $maxDistance: 400,
+            $minDistance: 0,
           },
-          $maxDistance: 400,
-          $minDistance: 0,
         },
-      },
-    });
-    return uopers;
+      });
+      return uopers;
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
