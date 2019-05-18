@@ -20,9 +20,9 @@ router.get('/:id?', async (req, res, next) => {
   }
   try {
     const { username, description, avatar, _id } = await User.findById(user);
-    const opinions = await Opinion.find({ author: { $in: [user] } }).select('question response -_id');
+    const opinions = await Opinion.find({ author: { $in: [user] } }).select('question response');
     res.status(200).json({
-      message: 'User data returned succesfully',
+      message: 'User data returned successfully',
       user: {
         username,
         _id,
@@ -53,7 +53,7 @@ router.put('/', async (req, res, next) => {
       }
       user = await User.findByIdAndUpdate(userId, { username, description, avatar }, { new: true });
       res.status(200).json({
-        message: 'User profile updated succesfully',
+        message: 'User profile updated successfully',
         user,
       });
     } catch (error) {
