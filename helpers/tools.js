@@ -1,7 +1,6 @@
 const User = require('../models/user');
 
 module.exports = {
-  // findUserSocket: async (id, sockets) => { sockets.find(u => u.userId === id); },
   findUserSocket: (id, sockets) => sockets.findIndex(socket => socket.userId === id),
 
   updateUserPosition: async (userId, position) => {
@@ -15,22 +14,16 @@ module.exports = {
     }
   },
 
-  updateDbPosition: async (userId, position) => {
-    const user = await User.findOne({ _id: userId });
-
-    user.position = {
-      type: 'Point',
-      coordinates: position,
-    };
-    await user.save();
-
-    return user;
+  updateAllUserPositions: async (sockets) => {
+    for (const userSocket of sockets) {
+      updateUserPosition(userSocket.id, userSocket.position);
+    }
   },
 
-  findNearOpiners: async (userId) => {
+  findNearUopers: async (userId) => {
     const user = await User.findOne({ _id: userId });
 
-    const opiners = await User.find({
+    const uopers = await User.find({
       position: {
         $near: {
           $geometry: {
@@ -42,6 +35,6 @@ module.exports = {
         },
       },
     });
-    return opiners;
+    return uopers;
   },
 };
