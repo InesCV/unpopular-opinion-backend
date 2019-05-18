@@ -12,7 +12,7 @@ const opinionSchema = new Schema({
     type: String,
     required: true,
     default: 'Random',
-    enum: ['Philosoraptor', 'Politics', 'Sex', 'Music', 'Food', 'Sports', 'Weird Stuff', 'Random'],
+    enum: ['Philosoraptor', 'Politics', 'Sex', 'Music', 'Food', 'Sports', 'Religion', 'Weird Stuff', 'Other'],
   },
   photo: {
     type: String,
