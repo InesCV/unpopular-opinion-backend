@@ -149,7 +149,7 @@ router.post('/', async (req, res, next) => {
           };
         } else {
           data = {
-            message: `Sorry, ${user.username} doesn't have response yet.`,
+            message: `Sorry, ${user.username} doesn't have responses yet.`,
             stats,
           };
         }
@@ -217,7 +217,7 @@ router.post('/', async (req, res, next) => {
         };
       } else {
         data = {
-          message: `Sorry, ${user.username} doesn't have response yet.`,
+          message: `Sorry, ${user.username} doesn't have responses yet.`,
           stats,
         };
       }
@@ -230,7 +230,7 @@ router.post('/', async (req, res, next) => {
       // If it hasn't responded to any opinion
       if (userResponses.length === 0) {
         data = {
-          message: "Sorry, the user hasn't responded any opinion yet.",
+          message: "Sorry, the user hasn't responded to any opinion yet.",
           stats,
         };
       } else {
@@ -270,7 +270,7 @@ router.post('/', async (req, res, next) => {
           };
         } else {
           data = {
-            message: `Sorry, ${user.username} doesn't have response yet.`,
+            message: `Sorry, ${user.username} doesn't have responses yet.`,
             stats,
           };
         }
@@ -473,13 +473,13 @@ router.post('/', async (req, res, next) => {
           }
         } else {
           data = {
-            message: `Sorry, ${userMatch.username} doesn't have response yet.`,
+            message: `Sorry, ${userMatch.username} doesn't have responses yet.`,
             stats,
           };
         }
       } else {
         data = {
-          message: `Sorry, ${user.username} doesn't have response yet.`,
+          message: `Sorry, ${user.username} doesn't have responses yet.`,
           stats,
         };
       }
