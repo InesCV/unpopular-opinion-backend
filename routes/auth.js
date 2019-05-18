@@ -45,7 +45,6 @@ router.post(
   validationSignup(),
   async (req, res, next) => {
     const { username, password, email } = req.body;
-
     try {
       // i: case insensitive
       // s: dot (.), blank spaces or new line
@@ -67,7 +66,8 @@ router.post(
 );
 
 router.post('/logout', isLoggedIn('user'), (req, res, next) => {
-  req.session.destroy();
+  // req.session.destroy();
+  req.session = null;
   return res.status(204).send();
 });
 
@@ -78,5 +78,3 @@ router.get('/private', isLoggedIn('user'), (req, res, next) => {
 });
 
 module.exports = router;
-
-//jdej@jdej.com

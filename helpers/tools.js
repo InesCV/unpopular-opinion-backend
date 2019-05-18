@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 module.exports = {
   // findUserSocket: async (id, sockets) => { sockets.find(u => u.userId === id); },
-  findUserSocket: async (id, sockets) => { sockets.findIndex(x => x.id === id); },
+  findUserSocket: (id, sockets) => sockets.findIndex(socket => socket.userId === id),
 
   updateUserPosition: async (userId, position) => {
     const user = await User.findOne({ _id: userId });
