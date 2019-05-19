@@ -66,8 +66,7 @@ router.post(
 );
 
 router.post('/logout', isLoggedIn('user'), (req, res, next) => {
-  // req.session.destroy();
-  req.session = null;
+  req.session.destroy();
   return res.status(204).send();
 });
 
