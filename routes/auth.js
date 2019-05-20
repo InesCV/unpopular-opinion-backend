@@ -56,7 +56,11 @@ router.post(
       }
       const salt = bcrypt.genSaltSync(10);
       const hashPass = bcrypt.hashSync(password, salt);
-      const newUser = await User.create({ username, password: hashPass, email });
+      const position = {
+        type: 'Point',
+        coordinates: [0, 0],
+      };
+      const newUser = await User.create({ username, password: hashPass, email, position });
       req.session.currentUser = newUser;
       res.status(200).json(newUser);
     } catch (error) {
