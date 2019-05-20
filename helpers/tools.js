@@ -17,7 +17,7 @@ module.exports = {
   findNearUopers: async (userId) => {
     try {
       const user = await User.findOne({ _id: userId });
-  
+
       const uopers = await User.find({
         position: {
           $near: {
