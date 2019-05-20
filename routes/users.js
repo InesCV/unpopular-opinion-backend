@@ -48,7 +48,7 @@ router.put('/', async (req, res, next) => {
       // s: dot (.), blank spaces or new line
       // \b ... \b: solo permite cadenas que sean igual a "username"
       let user = await User.findOne({ username: new RegExp('\\b' + username + '\\b', 'is') }, 'username');
-      if (user) {
+      if (user && (user.username !== req.session.currentUser.username)) {
         return next(createError(422, 'Username already exist.'));
       }
       user = await User.findByIdAndUpdate(userId, { username, description, avatar }, { new: true });
