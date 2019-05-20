@@ -45,7 +45,6 @@ router.post(
   validationSignup(),
   async (req, res, next) => {
     const { username, password, email } = req.body;
-
     try {
       // i: case insensitive
       // s: dot (.), blank spaces or new line
@@ -57,7 +56,11 @@ router.post(
       }
       const salt = bcrypt.genSaltSync(10);
       const hashPass = bcrypt.hashSync(password, salt);
-      const newUser = await User.create({ username, password: hashPass, email });
+      const position = {
+        type: 'Point',
+        coordinates: [0, 0],
+      };
+      const newUser = await User.create({ username, password: hashPass, email, position });
       req.session.currentUser = newUser;
       res.status(200).json(newUser);
     } catch (error) {
@@ -78,5 +81,3 @@ router.get('/private', isLoggedIn('user'), (req, res, next) => {
 });
 
 module.exports = router;
-
-//jdej@jdej.com
