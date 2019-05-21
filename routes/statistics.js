@@ -33,6 +33,10 @@ router.post('/', async (req, res, next) => {
   let userData = null;
   let aux = null;
 
+  function groupBy(xs, f) {
+    return xs.reduce((r, v, i, a, k = f(v)) => ((r[k] || (r[k] = [])).push(v), r), {});
+  }
+
   if (!Object.prototype.hasOwnProperty.call(query, 'user')) {
     query.user = req.session.currentUser._id;
   }
@@ -508,9 +512,9 @@ router.post('/', async (req, res, next) => {
           // Find intersection between the user responses and all nearUopers responses
           aux = nearUopersResponses.filter(opinion => userResponses.includes(opinion));
           // Find all opinions responded by all nearUopers
-          const intersection = userResponses.map(opinion => {
-            let cont = nearUopersResponses.filter(element => element == opinion).length;
-            if (cont === 3) {
+          const intersection = userResponses.map((opinion) => {
+            const cont = nearUopersResponses.filter(element => element == opinion).length;
+            if (cont === query.nearUopers.length) {
               return opinion;
             }
           });
@@ -561,7 +565,7 @@ router.post('/', async (req, res, next) => {
           }
         } else {
           data = {
-            message: `Sorry, nearUopers doesn't have response to the same opinions.`,
+            message: "Sorry, nearUopers doesn't have response to the same opinions.",
             stats,
           };
         }
@@ -574,6 +578,141 @@ router.post('/', async (req, res, next) => {
       break;
 
     case 'inMyZoneCategory':
+      // Users objects with name and link to him profile (to return with json)
+      // userData = await User.findById(query.user);
+      // user = {
+      //   username: userData.username,
+      //   request: {
+      //     type: 'GET',
+      //     url: `${process.env.HEROKU}/users/${userData._id}`,
+      //   },
+      // };
+      // // Find all responses of user
+      // aux = await Response.find({ user: query.user }).select('opinion -_id');
+      // userResponses = aux.map(({ opinion }) => String(opinion));
+      // if (userResponses.length > 0) {
+      //   // Find all responses of nearUopers
+      //   aux = await Response.find({ user: { $in: query.nearUopers } }).select('opinion -_id');
+      //   const nearUopersResponses = aux.map(({ opinion }) => String(opinion));
+      //   if (nearUopersResponses.length > 0) {
+      //     // Find intersection between the user responses and all nearUopers responses
+      //     aux = nearUopersResponses.filter(opinion => userResponses.includes(opinion));
+      //     // Find all opinions responded by all nearUopers
+      //     const intersection = userResponses.map((opinion) => {
+      //       const cont = nearUopersResponses.filter(element => element == opinion).length;
+      //       if (cont === query.nearUopers.length) {
+      //         return opinion;
+      //       }
+      //     });
+      //     if (intersection.length > 0) {
+      //       // Find all the opinions responded by all users
+      //       const matchingResponses = await Response
+      //         .find({
+      //           $and: [
+      //             { opinion: { $in: intersection } },
+      //             {
+      //               $or: [
+      //                 { user: { $in: query.nearUopers } },
+      //               ],
+      //             },
+      //           ],
+      //         })
+      //         .populate('opinion user');
+      //       // Create an array of categories
+      //       const categories = Opinion.schema.path('category').enumValues;
+      //       avg = [];
+      //       for (const category of categories) {
+      //         let totalCategory = 0;
+      //         likeUser = 0;
+      //         // Filter all opinions of a specific category
+      //         aux = matchingResponses.filter(resp => resp.opinion.category == category);
+      //         let result = null;
+      //         if (aux.length > 0) {
+      //           // const groupBy = aux.reduce((groupedByOpinion, response) => {
+      //           //     const id = response['opinion'];
+      //           //     groupedByOpinion[id] = (groupedByOpinion[id] || []).concat(response);
+      //           //     return groupedByOpinion;
+      //           //   }, {});
+
+                
+      //           result = groupBy(aux, c => c.opinion._id);
+
+      //         }
+
+
+      //         Object.keys(obj).forEach(function (key) {
+      //           // do something with obj[key]
+      //        });
+
+
+      //       }
+
+
+
+
+
+
+
+
+            //   opinions = await Opinion.find({ category }).select('_id');
+            //   if (opinions.length > 0) {
+            //     // Traverse opinions array
+            //     for (const opinion of opinions) {
+            //       // Find all the responses for a specific opinion
+            //       responses = await Response.find({ opinion });
+            //       if (responses.length > 0) {
+            //         // Find what the user has responded to that specific opinion
+            //         responseIndex = responses.findIndex(resp => resp.user.equals(query.user));
+            //         // Count how many people have responded the same as the user
+            //         if (responseIndex >= 0) {
+            //           total = responses.reduce((cont, resp) => {
+            //             if (resp.response == responses[responseIndex].response) {
+            //               return cont + 1;
+            //             }
+            //             return cont;
+            //           }, 0);
+            //           // Acumulate the total of people that has responded the same as the user for this opinion
+            //           likeUser += total;
+            //           totalCategory += responses.length;
+            //         }
+            //       }
+            //     }
+
+
+
+
+              
+            //     // Calculate the % of the user to this category
+            //     const result = Math.round(((likeUser / totalCategory) * 100) * 100) / 100;
+            //     // Add stat to avg array
+            //     if (likeUser > 0) {
+            //       avg.push({
+            //         category,
+            //         percent: result,
+            //         totalOpinions: totalCategory,
+            //       });
+            //     }
+            //   }
+            // }
+
+      //     } else {
+      //       data = {
+      //         message: "Sorry, there aren't matching responses.",
+      //         stats,
+      //       };
+      //     }
+      //   } else {
+      //     data = {
+      //       message: `Sorry, nearUopers doesn't have response to the same opinions.`,
+      //       stats,
+      //     };
+      //   }
+      // } else {
+      //   data = {
+      //     message: `Sorry, ${user.username} doesn't have responses yet.`,
+      //     stats,
+      //   };
+      // }
       break;
 
     default:
