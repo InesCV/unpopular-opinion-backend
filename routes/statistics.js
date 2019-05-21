@@ -30,6 +30,8 @@ router.post('/', async (req, res, next) => {
   let user = null;
   let likeUser = 0;
   let avg = 0;
+  let userData = null;
+  let aux = null;
 
   if (!Object.prototype.hasOwnProperty.call(query, 'user')) {
     query.user = req.session.currentUser._id;
@@ -407,7 +409,7 @@ router.post('/', async (req, res, next) => {
 
     case 'matchRate':
       // Users objects with name and link to him profile (to return with json)
-      let userData = await User.findById(query.user);
+      userData = await User.findById(query.user);
       user = {
         username: userData.username,
         request: {
@@ -424,7 +426,7 @@ router.post('/', async (req, res, next) => {
         },
       };
       // Find all responses of user
-      let aux = await Response.find({ user: query.user }).select('opinion -_id');
+      aux = await Response.find({ user: query.user }).select('opinion -_id');
       userResponses = aux.map(({ opinion }) => String(opinion));
       if (userResponses.length > 0) {
         // Find all responses of userMatch
@@ -483,6 +485,95 @@ router.post('/', async (req, res, next) => {
           stats,
         };
       }
+      break;
+
+    case 'inMyZoneRate':
+      // Users objects with name and link to him profile (to return with json)
+      userData = await User.findById(query.user);
+      user = {
+        username: userData.username,
+        request: {
+          type: 'GET',
+          url: `${process.env.HEROKU}/users/${userData._id}`,
+        },
+      };
+      // Find all responses of user
+      aux = await Response.find({ user: query.user }).select('opinion -_id');
+      userResponses = aux.map(({ opinion }) => String(opinion));
+      if (userResponses.length > 0) {
+        // Find all responses of nearUopers
+        aux = await Response.find({ user: { $in: query.nearUopers } }).select('opinion -_id');
+        const nearUopersResponses = aux.map(({ opinion }) => String(opinion));
+        if (nearUopersResponses.length > 0) {
+          // Find intersection between the user responses and all nearUopers responses
+          aux = nearUopersResponses.filter(opinion => userResponses.includes(opinion));
+          // Find all opinions responded by all nearUopers
+          const intersection = userResponses.map(opinion => {
+            let cont = nearUopersResponses.filter(element => element == opinion).length;
+            if (cont === 3) {
+              return opinion;
+            }
+          });
+          if (intersection.length > 0) {
+            // Find all the opinions responded by all users
+            const matchingResponses = await Response
+              .find({
+                $and: [
+                  { opinion: { $in: intersection } },
+                  {
+                    $or: [
+                      { user: { $in: query.nearUopers } },
+                    ],
+                  },
+                ],
+              });
+            // Count conincidences between users responses
+            let matches = 0;
+            intersection.forEach((opinion) => {
+              // Find all responses of this opinion
+              aux = matchingResponses.filter(resp => resp.opinion == opinion);
+              // Find what the user has responded to that specific opinion
+              const userResponseIndex = aux.findIndex(resp => resp.user.equals(query.user));
+              let userLike = 0;
+              aux.forEach((op) => {
+                if (op.response == aux[userResponseIndex].response) {
+                  userLike++;
+                }
+              });
+              matches += userLike;
+            });
+            console.log(`Matches: ${matches}, total: ${matchingResponses.length}`);
+            // Calculate the % of match between users
+            avg = Math.round(((matches / matchingResponses.length) * 100) * 100) / 100;
+            data = {
+              message: `${user.username} acceptance in this zone.`,
+              stats: {
+                avg, // Average of how many users has responded like user
+                matches, // How many users has responded like user
+                totalResponses: matchingResponses.length, // Total responses in the zone
+              },
+            };
+          } else {
+            data = {
+              message: "Sorry, there aren't matching responses.",
+              stats,
+            };
+          }
+        } else {
+          data = {
+            message: `Sorry, nearUopers doesn't have response to the same opinions.`,
+            stats,
+          };
+        }
+      } else {
+        data = {
+          message: `Sorry, ${user.username} doesn't have responses yet.`,
+          stats,
+        };
+      }
+      break;
+
+    case 'inMyZoneCategory':
       break;
 
     default:
