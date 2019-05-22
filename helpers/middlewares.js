@@ -1,12 +1,11 @@
 const createError = require('http-errors');
 
 exports.isLoggedIn = role => (req, res, next) => {
-  // if (req.session.currentUser && ((req.session.currentUser.role == role) || (req.session.currentUser.role == 'admin'))) {
-  //   next();
-  // } else {
-  //   next(createError(401, 'User not logged'));
-  // }
-  next();
+  if (req.session.currentUser && ((req.session.currentUser.role == role) || (req.session.currentUser.role == 'admin'))) {
+    next();
+  } else {
+    next(createError(401, 'User not logged'));
+  }
 };
 
 exports.isNotLoggedIn = () => (req, res, next) => {
