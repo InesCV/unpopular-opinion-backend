@@ -510,23 +510,21 @@ router.post('/', async (req, res, next) => {
       const nearUopersIds = query.nearUopers.map(uoper => uoper._id);
 
       if (userResponses.length > 0) {
-        // Find all responses of nearUopers
+        // Find all opinions responded by our nearUopers
         aux = await Response.find({ user: { $in: nearUopersIds } }).select('opinion -_id');
-        console.log(aux);
         const nearUopersResponses = aux.map(({ opinion }) => String(opinion));
-        console.log(nearUopersResponses);
         if (nearUopersResponses.length > 0) {
           // Find intersection between the user responses and all nearUopers responses
-          aux = nearUopersResponses.filter(opinion => userResponses.includes(opinion));
+          const intersection = nearUopersResponses.filter(opinion => userResponses.includes(opinion));
           // Find all opinions responded by all nearUopers
-          const intersection = userResponses.map((opinion) => {
-            const cont = nearUopersResponses.filter(element => element == opinion).length;
-            if (cont === query.nearUopers.length) {
-              return opinion;
-            }
-          });
+          // const intersection = userResponses.map((opinion) => {
+          //   const cont = nearUopersResponses.filter(element => element == opinion).length;
+          //   if (cont === query.nearUopers.length) {
+          //     return opinion;
+          //   }
+          // });
           if (intersection.length > 0) {
-            // Find all the opinions responded by all users
+            // Find the interjection responses of all near uopers
             const matchingResponses = await Response
               .find({
                 $and: [
@@ -543,16 +541,26 @@ router.post('/', async (req, res, next) => {
             for (const opinion of intersection) {
               // Find all responses of this opinion
               aux = matchingResponses.filter(resp => resp.opinion == opinion);
-              // Find what the user has responded to that specific opinion
-              const userResponseIndex = aux.findIndex(resp => resp.user.equals(query.user));
+              
+              // Find user response to this opinion
+              const { response } = await Response
+                .find({
+                  $and: [
+                    { opinion },
+                    { user: query.user },
+                  ],
+                });
+
+              // Count how many have responded as the user
               let userLike = 0;
               for (const op of aux) {
-                if (op.response == aux[userResponseIndex].response) {
+                if (op.response == response) {
                   userLike++;
                 }
               }
               matches += userLike;
             }
+
             // Calculate the % of match between users
             avg = Math.round(((matches / matchingResponses.length) * 100) * 100) / 100;
             data = {
@@ -563,6 +571,8 @@ router.post('/', async (req, res, next) => {
                 totalResponses: matchingResponses.length, // Total responses in the zone
               },
             };
+            console.log(data);
+            
           } else {
             data = {
               message: "Sorry, there aren't matching responses.",
