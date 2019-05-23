@@ -536,6 +536,7 @@ router.post('/', async (req, res, next) => {
                   },
                 ],
               });
+
             // Count conincidences between users responses
             let matches = 0;
             for (const opinion of intersection) {
@@ -544,12 +545,14 @@ router.post('/', async (req, res, next) => {
               
               // Find user response to this opinion
               const { response } = await Response
-                .find({
+                .findOne({
                   $and: [
                     { opinion },
                     { user: query.user },
                   ],
                 });
+              console.log("response", response);
+              
 
               // Count how many have responded as the user
               let userLike = 0;
