@@ -550,9 +550,7 @@ router.post('/', async (req, res, next) => {
                     { opinion },
                     { user: query.user },
                   ],
-                });
-              console.log("response", response);
-              
+                });              
 
               // Count how many have responded as the user
               let userLike = 0;
@@ -574,8 +572,6 @@ router.post('/', async (req, res, next) => {
                 totalResponses: matchingResponses.length, // Total responses in the zone
               },
             };
-            console.log(data);
-            
           } else {
             data = {
               message: "Sorry, there aren't matching responses.",
@@ -648,7 +644,6 @@ router.post('/', async (req, res, next) => {
               let result;
               if (aux.length > 0) {
                 result = groupBy(aux, c => c.opinion._id);
-                console.log(result);
                 Object.keys(result).forEach((opinionId) => {
                   // Count conincidences between users responses
                   let matches = 0;
