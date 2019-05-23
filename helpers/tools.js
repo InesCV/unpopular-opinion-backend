@@ -25,7 +25,7 @@ module.exports = {
               type: 'Point',
               coordinates: [user.position.coordinates[0], user.position.coordinates[1]],
             },
-            $maxDistance: 400,
+            $maxDistance: 500,
             $minDistance: 0,
           },
         },

@@ -293,7 +293,7 @@ router.post('/', async (req, res, next) => {
         const users = [];
 
         // Count how many people have responded the same to an specific opinion
-        responses.forEach((resp) => {
+        for (const resp of responses) {
           if (resp.response == 'x') {
             xVotes++;
           } else {
@@ -308,7 +308,7 @@ router.post('/', async (req, res, next) => {
             },
           };
           users.push(user);
-        });
+        }
 
         // Calculate the % of the people that has responded the same to an specific opinion
         const totalVotes = responses.length;
@@ -378,13 +378,13 @@ router.post('/', async (req, res, next) => {
         let yVotes = 0;
 
         // Count how many people have responded the same
-        responses.forEach((resp) => {
+        for (const resp of responses) {
           if (resp.response == 'x') {
             xVotes++;
           } else {
             yVotes++;
           }
-        });
+        }
 
         // Calculate the % of the people that has responded the same
         const totalVotes = responses.length;
@@ -457,12 +457,12 @@ router.post('/', async (req, res, next) => {
 
             // Count conincidences between users responses
             let matches = 0;
-            intersection.forEach((opinion) => {
+            for (const opinion of intersection) {
               const auxi = matchingResponses.filter(resp => resp.opinion == opinion);
               if (auxi[0].response === auxi[1].response) {
                 matches++;
               }
-            });
+            }
 
             // Calculate the % of match between users
             avg = Math.round(((matches / intersection.length) * 100) * 100) / 100;
@@ -504,10 +504,17 @@ router.post('/', async (req, res, next) => {
       // Find all responses of user
       aux = await Response.find({ user: query.user }).select('opinion -_id');
       userResponses = aux.map(({ opinion }) => String(opinion));
+
+      // Removes currentUser of nearUopers array
+      query.nearUopers.splice(query.nearUopers.findIndex(uoper => uoper._id == query.user), 1);
+      const nearUopersIds = query.nearUopers.map(uoper => uoper._id);
+
       if (userResponses.length > 0) {
         // Find all responses of nearUopers
-        aux = await Response.find({ user: { $in: query.nearUopers } }).select('opinion -_id');
+        aux = await Response.find({ user: { $in: nearUopersIds } }).select('opinion -_id');
+        console.log(aux);
         const nearUopersResponses = aux.map(({ opinion }) => String(opinion));
+        console.log(nearUopersResponses);
         if (nearUopersResponses.length > 0) {
           // Find intersection between the user responses and all nearUopers responses
           aux = nearUopersResponses.filter(opinion => userResponses.includes(opinion));
@@ -533,20 +540,19 @@ router.post('/', async (req, res, next) => {
               });
             // Count conincidences between users responses
             let matches = 0;
-            intersection.forEach((opinion) => {
+            for (const opinion of intersection) {
               // Find all responses of this opinion
               aux = matchingResponses.filter(resp => resp.opinion == opinion);
               // Find what the user has responded to that specific opinion
               const userResponseIndex = aux.findIndex(resp => resp.user.equals(query.user));
               let userLike = 0;
-              aux.forEach((op) => {
+              for (const op of aux) {
                 if (op.response == aux[userResponseIndex].response) {
                   userLike++;
                 }
-              });
+              }
               matches += userLike;
-            });
-            console.log(`Matches: ${matches}, total: ${matchingResponses.length}`);
+            }
             // Calculate the % of match between users
             avg = Math.round(((matches / matchingResponses.length) * 100) * 100) / 100;
             data = {
