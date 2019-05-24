@@ -558,7 +558,6 @@ router.post('/', async (req, res, next) => {
                 }
               }
               matches += userLike;
-              console.log(`Opinion: ${opinion}, matches: ${matches}`);
             }
 
             // Calculate the % of match between users
